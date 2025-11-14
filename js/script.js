@@ -5,6 +5,12 @@ const password = document.getElementById('password')
 const confirmPassword = document.getElementById('confirmPassword')
 const successMessage = document.getElementById('successMessage')
 
+window.addEventListener('DOMContentLoaded', () => {
+        const savedUsername = localStorage.getItem('username')
+        if (savedUsername) {
+        username.value = savedUsername
+    }
+})
 
 function validateUsername() {
     if (username.validity.valueMissing) {
@@ -86,3 +92,44 @@ password.addEventListener('input', () => {
 })
 
 confirmPassword.addEventListener('input', validateConfirmPassword)
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault() // Prevent default form submission
+
+    // Hide any previous success message
+    successMessage.style.display = 'none'
+
+    // Validate all fields
+    const isUsernameValid = validateUsername()
+    const isEmailValid = validateEmail()
+    const isPasswordValid = validatePassword()
+    const isConfirmPasswordValid = validateConfirmPassword()
+
+    // Check if all fields are valid
+    const isFormValid = isUsernameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid
+
+    if (isFormValid) {
+        // Save username to localStorage
+        localStorage.setItem('username', username.value)
+
+        // Show success message
+        successMessage.style.display = 'block'
+
+        // Optionally reset the form (except username)
+        const savedUsername = username.value
+        form.reset()
+        username.value = savedUsername
+
+        // Clear all valid classes
+        document.querySelectorAll('.valid').forEach(el => {
+            el.classList.remove('valid')
+        })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+        // Focus on first invalid field
+        if (!isUsernameValid) username.focus()
+        else if (!isEmailValid) email.focus()
+        else if (!isPasswordValid) password.focus()
+        else if (!isConfirmPasswordValid) confirmPassword.focus()
+    }
+})
